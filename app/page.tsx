@@ -15,7 +15,7 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
               </div>
-              <div className="text-xl font-bold text-gray-900">Yagnesh Patel</div>
+              <div className="text-xl font-bold text-gray-900">Yagnesh</div>
             </div>
             
             <div className="hidden md:flex gap-8">
