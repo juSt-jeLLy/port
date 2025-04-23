@@ -98,8 +98,8 @@ export default function Home() {
                 <h1 className="text-4xl md:text-5xl font-bold mb-4">Yagnesh</h1>
                 <h2 className="text-2xl md:text-3xl text-gray-600 mb-6 flex items-center">
                   <span>Blockchain Developer</span>
-                  <span className="mx-2 text-gray-400">•</span>
-                  <span className="text-blue-600">Web3 Enthusiast</span>
+                  <span className="mx-2 text-gray-400"></span>
+                  <span className="text-blue-600"></span>
                 </h2>
                 
                 <p className="mb-6 text-gray-700 leading-relaxed">
