@@ -1,15 +1,24 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useFrame, Canvas } from '@react-three/fiber'
 import { Group, Color, PointLight } from 'three'
-import { useSpring, animated } from '@react-spring/three'
 
 const PARTICLE_COUNT = 2000
 const PARTICLE_SIZE = 0.03
 
 function Particles() {
   const ref = useRef<Group>(null)
+  const [scale, setScale] = useState(0)
+  
+  useEffect(() => {
+    // Trigger animation start after delay
+    const timer = setTimeout(() => {
+      setScale(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+  
   const positions = React.useMemo(() => {
     const positions = []
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -42,18 +51,24 @@ function Particles() {
     if (ref.current) {
       ref.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.05) * 0.1
       ref.current.rotation.z = Math.cos(clock.getElapsedTime() * 0.05) * 0.05
+      
+      // Handle scaling animation
+      if (scale > 0) {
+        const t = clock.getElapsedTime();
+        const animProgress = Math.min(1, (t - 0.5) / 1.5);
+        if (animProgress < 1) {
+          // Spring-like easing
+          const springEffect = 1 - Math.pow(1 - animProgress, 3);
+          ref.current.scale.set(springEffect, springEffect, springEffect);
+        } else {
+          ref.current.scale.set(1, 1, 1);
+        }
+      }
     }
   })
 
-  const springProps = useSpring({
-    from: { scale: [0, 0, 0] },
-    to: { scale: [1, 1, 1] },
-    config: { mass: 5, tension: 500, friction: 150 },
-    delay: 500,
-  })
-
   return (
-    <animated.group ref={ref} scale={springProps.scale as any}>
+    <group ref={ref} scale={0}>
       <points>
         <bufferGeometry>
           <bufferAttribute
@@ -79,7 +94,7 @@ function Particles() {
           sizeAttenuation
         />
       </points>
-    </animated.group>
+    </group>
   )
 }
 

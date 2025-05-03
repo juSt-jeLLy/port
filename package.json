@@ -19,7 +19,6 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-move": "^6.5.0",
-    "react-spring": "^9.7.5",
     "remotion": "^4.0.295",
     "three": "^0.176.0"
   },
