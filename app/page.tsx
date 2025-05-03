@@ -1,1067 +1,2209 @@
-import Image from "next/image";
-import Link from "next/link";
+'use client'
+
+import { useEffect, useState } from 'react'
+import Image from "next/image"
+import Link from "next/link"
+import GameBackground from './components/GameBackground'
+import GlitchText from './components/GlitchText'
+import GameButton from './components/GameButton'
+import Terminal from './components/Terminal'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<string>('home')
+  const [isLoading, setIsLoading] = useState(true)
+  const [scrollY, setScrollY] = useState(0)
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2000)
+
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  // Section navigation handler
+  const navigateToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId)
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' })
+      setActiveTab(sectionId)
+    }
+  }
+
+  // Loading screen
+  if (isLoading) {
   return (
-    <div className="bg-white text-gray-900 min-h-screen font-sans">
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <GameBackground />
+        <div className="text-center">
+          <GlitchText 
+            text="LOADING PORTFOLIO..." 
+            fontSize="2rem"
+            className="mb-6"
+          />
+          <div className="relative w-64 h-4 bg-opacity-20 bg-neon-blue rounded-full overflow-hidden">
+            <motion.div 
+              className="absolute top-0 left-0 h-full bg-neon-blue"
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 1.5, ease: 'easeInOut' }}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen font-rajdhani relative">
+      <GameBackground />
+      <div className="noise-overlay"></div>
+      
           {/* Navigation */}
-               {/* Navigation */}
-      <nav className="py-6 px-8 md:px-16 border-b bg-white shadow-sm sticky top-0 z-50">
+      <motion.nav 
+        className="py-6 px-8 md:px-16 border-b border-[#00eaff] bg-opacity-10 backdrop-filter backdrop-blur-md sticky top-0 z-50"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ 
+          duration: 0.8, 
+          ease: [0.25, 0.1, 0.25, 1],
+          staggerChildren: 0.1
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-50 p-2 rounded-full border border-blue-100">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <motion.div 
+              className="flex items-center gap-3"
+              whileHover={{ 
+                scale: 1.05,
+                textShadow: "0 0 8px rgb(0, 234, 255)",
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 10
+              }}
+            >
+              <motion.div 
+                className="bg-[#000f2b] p-2 rounded-full border border-[#00eaff] border-glow"
+                animate={{ 
+                  boxShadow: ["0 0 10px rgba(0, 234, 255, 0.5)", "0 0 20px rgba(0, 234, 255, 0.7)", "0 0 10px rgba(0, 234, 255, 0.5)"]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#00eaff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
-              </div>
-              <div className="text-xl font-bold text-gray-900">Yagnesh</div>
-            </div>
+                </motion.div>
+              </motion.div>
+              <GlitchText text="YAGNESH" className="text-xl font-bold text-glow" />
+            </motion.div>
             
             <div className="hidden md:flex gap-8">
-              <Link href="/" className="relative group">
-                <span className="text-gray-800 hover:text-blue-600 transition-colors">Home</span>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-              </Link>
-              <Link href="#projects" className="relative group">
-                <span className="text-gray-800 hover:text-blue-600 transition-colors">Projects</span>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-              </Link>
-              <Link href="#skills" className="relative group">
-                <span className="text-gray-800 hover:text-blue-600 transition-colors">Skills</span>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-              </Link>
-              <Link href="#contact" className="relative group">
-                <span className="text-gray-800 hover:text-blue-600 transition-colors">Contact</span>
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
-              </Link>
+              {['home', 'projects', 'skills', 'education', 'contact'].map((item, index) => (
+                <motion.button
+                  key={item}
+                  onClick={() => navigateToSection(item)}
+                  className={`relative group uppercase tracking-wider ${activeTab === item ? 'text-[#00eaff]' : 'text-[#e0e0e0]'}`}
+                  whileHover={{ 
+                    scale: 1.1,
+                    textShadow: "0 0 8px rgb(0, 234, 255)",
+                    color: "#00eaff"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: index * 0.1,
+                    type: "spring"
+                  }}
+                >
+                  <span className="transition-colors duration-300">{item}</span>
+                  <motion.span 
+                    className={`absolute -bottom-1 left-0 h-0.5 bg-[#00eaff] transition-all duration-300 ${
+                      activeTab === item ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                    animate={activeTab === item ? {
+                      boxShadow: ["0 0 5px rgba(0, 234, 255, 0.5)", "0 0 10px rgba(0, 234, 255, 0.7)", "0 0 5px rgba(0, 234, 255, 0.5)"]
+                    } : {}}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                </motion.button>
+              ))}
             </div>
             
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex gap-3">
-                <a href="https://github.com/juSt-jeLLy" target="_blank" className="text-gray-600 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-blue-50">
+              <motion.div 
+                className="hidden md:flex gap-3"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <motion.a 
+                  href="https://github.com/juSt-jeLLy" 
+                  target="_blank" 
+                  className="text-[#e0e0e0] hover:text-[#00eaff] transition-colors p-2 rounded-full hover:bg-[#000f2b]"
+                  whileHover={{ 
+                    scale: 1.2, 
+                    rotate: [0, 10, -10, 0],
+                    backgroundColor: "#000f2b",
+                    boxShadow: "0 0 8px rgba(0, 234, 255, 0.5)" 
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                   </svg>
-                </a>
-                <a href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" target="_blank" className="text-gray-600 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-blue-50">
+                </motion.a>
+                <motion.a 
+                  href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" 
+                  target="_blank" 
+                  className="text-[#e0e0e0] hover:text-[#00eaff] transition-colors p-2 rounded-full hover:bg-[#000f2b]"
+                  whileHover={{ 
+                    scale: 1.2, 
+                    rotate: [0, 10, -10, 0],
+                    backgroundColor: "#000f2b",
+                    boxShadow: "0 0 8px rgba(0, 234, 255, 0.5)" 
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                   </svg>
-                </a>
-              </div>
+                </motion.a>
+              </motion.div>
               
-              <Link 
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 500,
+                  duration: 0.5, 
+                  delay: 0.6 
+                }}
+              >
+                <GameButton 
                 href="/resume.pdf" 
                 target="_blank"
-                className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors text-sm font-medium flex items-center"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  className="text-white"
+                  type="primary"
+                  size="sm"
+                  icon={
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Resume
-              </Link>
+                  }
+                >
+                  RESUME
+                </GameButton>
+              </motion.div>
               
-              <button className="md:hidden text-gray-600 hover:text-blue-600 transition-colors">
+              <motion.button 
+                className="md:hidden text-[#e0e0e0] hover:text-[#00eaff] transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9, rotate: 90 }}
+                transition={{ duration: 0.2 }}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
-      </nav>
-
-
+      </motion.nav>
 
             {/* Hero Section */}
-            <section className="py-20 px-8 md:px-16">
+      <section id="home" className="py-20 px-8 md:px-16 min-h-[90vh] flex items-center">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path fillRule="evenodd" d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 01.75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 019.75 22.5a.75.75 0 01-.75-.75v-4.131A15.838 15.838 0 016.382 15H2.25a.75.75 0 01-.75-.75 6.75 6.75 0 017.815-6.666zM15 6.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" clipRule="evenodd" />
-                <path d="M5.26 17.242a.75.75 0 10-.897-1.203 5.243 5.243 0 00-2.05 5.022.75.75 0 00.625.627 5.243 5.243 0 005.022-2.051.75.75 0 10-1.202-.897 3.744 3.744 0 01-3.008 1.51c0-1.23.592-2.323 1.51-3.008z" />
-              </svg>
+          <motion.div 
+            className="card-glow p-8 rounded-lg relative overflow-hidden"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.8, 
+              type: "spring",
+              damping: 15,
+              stiffness: 100
+            }}
+            whileHover={{
+              boxShadow: "0 0 30px rgba(0, 234, 255, 0.4)",
+            }}
+          >
+            {/* Grid background for card */}
+            <div className="absolute inset-0 bg-grid">
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00eaff] to-transparent opacity-10"
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 3, 
+                  ease: "linear",
+                  repeatDelay: 1
+                }}
+              />
             </div>
             
-            <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            {/* Floating particles */}
+            <motion.div
+              className="absolute w-4 h-4 rounded-full bg-[#00eaff] opacity-20"
+              animate={{
+                x: [0, 30, 0],
+                y: [0, -40, 0],
+                opacity: [0.2, 0.3, 0.2],
+                scale: [1, 1.2, 1]
+              }}
+              transition={{
+                duration: 6,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+              style={{ left: '10%', top: '20%' }}
+            />
+            <motion.div
+              className="absolute w-2 h-2 rounded-full bg-[#00eaff] opacity-20"
+              animate={{
+                x: [0, -20, 0],
+                y: [0, 30, 0],
+                opacity: [0.2, 0.5, 0.2],
+                scale: [1, 1.5, 1]
+              }}
+              transition={{
+                duration: 8,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+              style={{ right: '20%', top: '30%' }}
+            />
+            <motion.div
+              className="absolute w-3 h-3 rounded-full bg-[#00eaff] opacity-20"
+              animate={{
+                x: [0, 40, 0],
+                y: [0, 20, 0],
+                opacity: [0.2, 0.4, 0.2],
+                scale: [1, 1.3, 1]
+              }}
+              transition={{
+                duration: 10,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+              style={{ left: '30%', bottom: '20%' }}
+            />
+            
+            <div className="flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
               <div className="md:w-3/5">
-                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700 mb-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#000f2b] border border-[#00eaff] text-[#00eaff] mb-6 hover:bg-[#001a33] hover:scale-105 transition-all"
+                  whileHover={{ 
+                    scale: 1.05, 
+                    boxShadow: "0 0 15px rgba(0, 234, 255, 0.7)",
+                  }}
+                >
+                  <motion.div 
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="mr-1"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
+                  </motion.div>
                   <span>Blockchain Developer</span>
-                </div>
+                </motion.div>
                 
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">Yagnesh</h1>
-                <h2 className="text-2xl md:text-3xl text-gray-600 mb-6 flex items-center">
-                  <span>Blockchain Developer</span>
-                  <span className="mx-2 text-gray-400"></span>
-                  <span className="text-blue-600"></span>
-                </h2>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <GlitchText text="YAGNESH" className="text-4xl md:text-5xl font-bold mb-4" />
+                  <motion.h2 
+                    className="text-2xl md:text-3xl text-gray-400 mb-6 flex items-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                  >
+                    <motion.span
+                      animate={{ color: ["#e0e0e0", "#00eaff", "#e0e0e0"] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Blockchain Developer
+                    </motion.span>
+                    <span className="mx-2 text-gray-600">|</span>
+                    <motion.span 
+                      className="text-[#00eaff]"
+                      animate={{ 
+                        textShadow: [
+                          "0 0 5px rgba(0, 234, 255, 0.3)", 
+                          "0 0 15px rgba(0, 234, 255, 0.7)", 
+                          "0 0 5px rgba(0, 234, 255, 0.3)"
+                        ] 
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      Web3 Explorer
+                    </motion.span>
+                  </motion.h2>
+                </motion.div>
                 
-                <p className="mb-6 text-gray-700 leading-relaxed">
+                <motion.p 
+                  className="mb-6 text-gray-300 leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
                   Blockchain developer with experience in building decentralized applications (dApps), AI-driven solutions, and smart contracts. 
                   Proficient in React, Next.js, Solidity, and integrating blockchain technologies like Ethers.js and WalletConnect. 
                   Actively participated in hackathons, focusing on Web3, DeFi, and AI innovations.
-                </p>
+                </motion.p>
                 
-                <div className="flex flex-wrap gap-4 mb-8">
-                  <a 
-                    href="/resume.pdf" 
-                    className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-colors"
+                <motion.div 
+                  className="flex flex-wrap gap-4 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 500 
+                    }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <GameButton 
+                      href="/resume.pdf" 
+                      target="_blank"
+                      type="primary"
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    View Resume
-                  </a>
-                  <a 
-                    href="#projects" 
-                    className="inline-flex items-center border border-gray-300 px-6 py-3 rounded-full hover:bg-gray-100 transition-colors"
+                      }
+                    >
+                      VIEW RESUME
+                    </GameButton>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 500 
+                    }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <GameButton 
+                      onClick={() => navigateToSection('projects')}
+                      type="secondary"
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
-                    Explore Work
-                  </a>
-                </div>
+                      }
+                    >
+                      EXPLORE WORK
+                    </GameButton>
+                  </motion.div>
+                </motion.div>
                 
-                <div className="flex items-center gap-4">
-                  <span className="text-gray-500 text-sm">Connect with me:</span>
+                <motion.div 
+                  className="flex items-center gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                >
+                  <span className="text-gray-400 text-sm">Connect with me:</span>
                   <div className="flex gap-3">
-                    <a href="https://github.com/juSt-jeLLy" target="_blank" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    <motion.a 
+                      href="https://github.com/juSt-jeLLy" 
+                      target="_blank" 
+                      className="text-gray-400 hover:text-[#00eaff] transition-colors"
+                      whileHover={{ 
+                        scale: 1.2, 
+                        rotate: [0, 15, -15, 0],
+                        color: "#00eaff",
+                        textShadow: "0 0 8px rgba(0, 234, 255, 0.7)" 
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                       </svg>
-                    </a>
-                    <a href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" target="_blank" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    </motion.a>
+                    <motion.a 
+                      href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" 
+                      target="_blank" 
+                      className="text-gray-400 hover:text-[#00eaff] transition-colors"
+                      whileHover={{ 
+                        scale: 1.2, 
+                        rotate: [0, 15, -15, 0],
+                        color: "#00eaff",
+                        textShadow: "0 0 8px rgba(0, 234, 255, 0.7)" 
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                       </svg>
-                    </a>
-                    <a href="mailto:yagneshpatel931@gmail.com" className="text-gray-600 hover:text-blue-600 transition-colors">
+                    </motion.a>
+                    <motion.a 
+                      href="mailto:yagneshpatel931@gmail.com" 
+                      className="text-gray-400 hover:text-[#00eaff] transition-colors"
+                      whileHover={{ 
+                        scale: 1.2, 
+                        rotate: [0, 15, -15, 0],
+                        color: "#00eaff",
+                        textShadow: "0 0 8px rgba(0, 234, 255, 0.7)" 
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                    </a>
+                    </motion.a>
                   </div>
-                </div>
+                </motion.div>
               </div>
               
-              <div className="md:w-2/5">
-                <div className="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-100">
-                  <h3 className="text-xl font-bold mb-4 text-blue-700 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    Core Expertise
-                  </h3>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+              <motion.div 
+                className="md:w-2/5"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                whileHover={{ 
+                  scale: 1.03,
+                  boxShadow: "0 0 20px rgba(0, 234, 255, 0.4)"
+                }}
+              >
+                <Terminal
+                  text={[
+                    "Loading profile data...",
+                    "Blockchain developer initialized",
+                    "Smart contract knowledge: 100%",
+                    "Web3 integration expertise: 100%",
+                    "React/Next.js proficiency: 100%",
+                    "AI integration capability: 100%",
+                    "System ready for blockchain operations"
+                  ]}
+                  className="w-full"
+                />
+              </motion.div>
                       </div>
-                      <span className="font-medium">Smart Contract Development</span>
+          </motion.div>
                     </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">Web3 Integration</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">DeFi Applications</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">AI-Blockchain Integration</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors">
-                      <div className="bg-blue-100 p-2 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">Modern Frontend Development</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Accomplishments Section */}
-      <section className="py-16 px-8 md:px-16 bg-gray-50">
-        <h2 className="text-3xl font-bold mb-10 text-center">Accomplishments</h2>
-        <div className="max-w-5xl mx-auto">
-          {/* Timeline-style layout */}
-          <div className="relative">
-            {/* Center line */}
-            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-blue-200"></div>
-            
-            {/* First accomplishment - Left side */}
-            <div className="md:flex mb-12">
-              <div className="md:w-5/12 md:pr-8 md:text-right">
-                <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-                  {/* Background pattern */}
-                  <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                      <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                    </svg>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-1">Winner – ETHGlobal's Agentic Ethereum</h3>
-                      <p className="text-gray-600 mb-1 text-sm">1710 hackers, 518 projects, 10 finalists, 94 countries</p>
-                      <p className="text-gray-700 mb-2">Clash of Clout: AI-Powered Meme and Engagement Platform — Gaia/Collab.land Track and Flow Track ($3,500 Prize)</p>
-                      <a 
-                        href="https://ethglobal.com/showcase/clash-of-clout-ixvs9" 
-                        target="_blank" 
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm"
-                      >
-                        <span>View Project Showcase</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      <section className="py-16 px-8 md:px-16 bg-deep-blue bg-opacity-30">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <GlitchText text="ACCOMPLISHMENTS" className="text-3xl md:text-4xl font-bold mb-4" />
+            <p className="text-gray-400 max-w-2xl mx-auto">Award-winning blockchain projects from global hackathons</p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* ETHGlobal Agentic Ethereum */}
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                y: -15,
+                boxShadow: '0 0 30px var(--glow-blue), 0 0 45px var(--glow-blue)'
+              }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden cursor-pointer group"
+            >
+              {/* Game-inspired background */}
+              <div className="absolute inset-0 bg-grid"></div>
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')" }}
+              ></div>
+              <motion.div 
+                className="absolute -bottom-2 -right-2 w-32 h-32 opacity-10"
+                animate={{ 
+                  rotate: 360,
+                  opacity: [0.1, 0.15, 0.1]
+                }}
+                transition={{ 
+                  rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                  opacity: { duration: 3, repeat: Infinity, yoyo: true }
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#00eaff]">
+                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
                         </svg>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
               
-              {/* Circle connector - visible only on md and up */}
-              <div className="hidden md:flex items-center justify-center w-2/12">
-                <div className="bg-blue-600 rounded-full w-6 h-6 border-4 border-white shadow-md z-10"></div>
-              </div>
-              
-              <div className="md:w-5/12 md:pl-8 hidden md:block"></div>
-            </div>
-            
-            {/* Second accomplishment - Right side */}
-            <div className="md:flex mb-12">
-              <div className="md:w-5/12 md:pr-8 hidden md:block"></div>
-              
-              {/* Circle connector - visible only on md and up */}
-              <div className="hidden md:flex items-center justify-center w-2/12">
-                <div className="bg-blue-600 rounded-full w-6 h-6 border-4 border-white shadow-md z-10"></div>
-              </div>
-              
-              <div className="md:w-5/12 md:pl-8">
-                <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-                  {/* Background pattern */}
-                  <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                      <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-1">1st Place – ETHGlobal's ETH Taipei 2025</h3>
-                      <p className="text-gray-600 mb-1 text-sm">530 hackers, 226 projects, 8 finalists, 43 countries</p>
-                      <p className="text-gray-700 mb-2">AgentActs.eth: Decentralized AI Agents Builder — 1inch Fusion+ Integration Track (Prize won $4,000)</p>
-                      <a 
-                        href="https://ethglobal.com/showcase/agentacts-eth-9yjkl" 
-                        target="_blank" 
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm"
-                      >
-                        <span>View Project Showcase</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              {/* Digital circuit lines */}
+              <motion.div
+                className="absolute inset-0 overflow-hidden"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                viewport={{ once: true }}
+              >
+                <svg width="100%" height="100%" viewBox="0 0 200 200" className="absolute">
+                  <motion.path
+                    d="M20,100 L80,100 L100,120 L150,120"
+                    stroke="#00eaff"
+                    strokeWidth="0.5"
+                    strokeDasharray="200"
+                    strokeDashoffset="200"
+                    fill="none"
+                    initial={{ strokeDashoffset: 200 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 1.5, delay: 0.3 }}
+                  />
+                  <motion.path
+                    d="M180,40 L150,40 L130,60 L130,150 L110,170 L40,170"
+                    stroke="#00eaff"
+                    strokeWidth="0.5"
+                    strokeDasharray="400"
+                    strokeDashoffset="400"
+                    fill="none"
+                    initial={{ strokeDashoffset: 400 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 2, delay: 0.5 }}
+                  />
                         </svg>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Third accomplishment - Left side */}
-            <div className="md:flex">
-              <div className="md:w-5/12 md:pr-8 md:text-right">
-                <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-                  {/* Background pattern */}
-                  <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                      <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.75.75 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
-                    </svg>
-                  </div>
+              </motion.div>
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <motion.div 
+                    whileHover={{ scale: 1.1 }} 
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#000f2b] border border-[#00eaff] text-[#00eaff]"
+                  >
+                    Winner
+                  </motion.div>
+                  <motion.div 
+                    whileHover={{ scale: 1.1, color: "#ffd700" }}
+                    className="text-gold text-lg font-bold"
+                  >
+                    $3,500
+                  </motion.div>
+                      </div>
                   
-                  <div className="flex items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold mb-1">Request Network End of Year Hackathon</h3>
-                      <p className="text-gray-600 mb-1 text-sm">120+ participants, 40+ projects, 5 finalists</p>
-                      <p className="text-gray-700 mb-2">HireFree: Decentralized Freelance Collaboration Platform — Streamlining milestone-based payments for freelancers</p>
-                      <a 
-                        href="https://devpost.com/software/hirefree" 
+                <h3 className="text-xl font-bold mb-2 text-glow">ETHGlobal's Agentic Ethereum</h3>
+                <p className="text-gray-400 text-sm mb-3">1710 hackers, 518 projects, 10 finalists, 94 countries</p>
+                
+                <p className="text-gray-300 mb-4">Clash of Clout: AI-Powered Meme and Engagement Platform — Gaia/Collab.land Track and Flow Track</p>
+                
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }} 
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <GameButton 
+                        href="https://ethglobal.com/showcase/clash-of-clout-qedfz" 
                         target="_blank" 
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors text-sm"
-                      >
-                        <span>View Project Showcase</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
+                    type="primary"
+                    size="sm"
+                  >
+                    View Project Showcase
+                  </GameButton>
+                </motion.div>
                     </div>
-                  </div>
-                </div>
+            </motion.div>
+            
+            {/* ETH Taipei */}
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                y: -15,
+                boxShadow: '0 0 30px var(--glow-blue), 0 0 45px var(--glow-blue)'
+              }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden cursor-pointer group"
+            >
+              {/* Game-inspired background */}
+              <div className="absolute inset-0 bg-grid"></div>
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1603481546238-487240415921?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')" }}
+              ></div>
+              <motion.div 
+                className="absolute -bottom-2 -right-2 w-32 h-32 opacity-10"
+                animate={{ 
+                  rotate: 360,
+                  opacity: [0.1, 0.15, 0.1]
+                }}
+                transition={{ 
+                  rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                  opacity: { duration: 3, repeat: Infinity, yoyo: true }
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#00eaff]">
+                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                </svg>
+              </motion.div>
+              
+              {/* Digital circuit lines */}
+              <motion.div
+                className="absolute inset-0 overflow-hidden"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                viewport={{ once: true }}
+              >
+                <svg width="100%" height="100%" viewBox="0 0 200 200" className="absolute">
+                  <motion.path
+                    d="M20,50 L60,50 L80,70 L160,70"
+                    stroke="#00eaff"
+                    strokeWidth="0.5"
+                    strokeDasharray="200"
+                    strokeDashoffset="200"
+                    fill="none"
+                    initial={{ strokeDashoffset: 200 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 1.5, delay: 0.4 }}
+                  />
+                  <motion.path
+                    d="M30,160 L80,160 L100,140 L100,90 L120,70 L180,70"
+                    stroke="#00eaff"
+                    strokeWidth="0.5"
+                    strokeDasharray="400"
+                    strokeDashoffset="400"
+                    fill="none"
+                    initial={{ strokeDashoffset: 400 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 2, delay: 0.6 }}
+                  />
+                </svg>
+              </motion.div>
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <motion.div 
+                    whileHover={{ scale: 1.1 }} 
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#000f2b] border border-[#00eaff] text-[#00eaff]"
+                  >
+                    1st Place
+                  </motion.div>
+                  <motion.div 
+                    whileHover={{ scale: 1.1, color: "#ffd700" }}
+                    className="text-gold text-lg font-bold"
+                  >
+                    $4,000
+                  </motion.div>
               </div>
               
-              {/* Circle connector - visible only on md and up */}
-              <div className="hidden md:flex items-center justify-center w-2/12">
-                <div className="bg-blue-600 rounded-full w-6 h-6 border-4 border-white shadow-md z-10"></div>
+                <h3 className="text-xl font-bold mb-2 text-glow">ETHGlobal's ETH Taipei 2025</h3>
+                <p className="text-gray-400 text-sm mb-3">530 hackers, 226 projects, 8 finalists, 43 countries</p>
+                
+                <p className="text-gray-300 mb-4">AgentActs.eth: Decentralized AI Agents Builder — 1inch Fusion+ Integration Track</p>
+                
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }} 
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <GameButton 
+                    href="https://ethglobal.com/showcase/agentacts-eth-89iga" 
+                    target="_blank" 
+                    type="primary"
+                    size="sm"
+                  >
+                    View Project Showcase
+                  </GameButton>
+                </motion.div>
+                    </div>
+            </motion.div>
+            
+            {/* Request Network */}
+            <motion.div 
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                y: -15,
+                boxShadow: '0 0 30px var(--glow-blue), 0 0 45px var(--glow-blue)'
+              }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden cursor-pointer group"
+            >
+              {/* Game-inspired background */}
+              <div className="absolute inset-0 bg-grid"></div>
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"
+                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1596464716127-f2a82984de30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')" }}
+              ></div>
+              <motion.div 
+                className="absolute -bottom-2 -right-2 w-32 h-32 opacity-10"
+                animate={{ 
+                  rotate: 360,
+                  opacity: [0.1, 0.15, 0.1]
+                }}
+                transition={{ 
+                  rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                  opacity: { duration: 3, repeat: Infinity, yoyo: true }
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#00eaff]">
+                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                    </svg>
+              </motion.div>
+              
+              {/* Digital circuit lines */}
+              <motion.div
+                className="absolute inset-0 overflow-hidden"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                viewport={{ once: true }}
+              >
+                <svg width="100%" height="100%" viewBox="0 0 200 200" className="absolute">
+                  <motion.path
+                    d="M30,30 L60,30 L80,50 L150,50"
+                    stroke="#00eaff"
+                    strokeWidth="0.5"
+                    strokeDasharray="200"
+                    strokeDashoffset="200"
+                    fill="none"
+                    initial={{ strokeDashoffset: 200 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 1.5, delay: 0.5 }}
+                  />
+                  <motion.path
+                    d="M160,120 L120,120 L100,140 L100,180"
+                    stroke="#00eaff"
+                    strokeWidth="0.5"
+                    strokeDasharray="200"
+                    strokeDashoffset="200"
+                    fill="none"
+                    initial={{ strokeDashoffset: 200 }}
+                    animate={{ strokeDashoffset: 0 }}
+                    transition={{ duration: 1.5, delay: 0.7 }}
+                  />
+                        </svg>
+              </motion.div>
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <motion.div 
+                    whileHover={{ scale: 1.1 }} 
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#000f2b] border border-[#00eaff] text-[#00eaff]"
+                  >
+                    Finalist
+                  </motion.div>
               </div>
               
-              <div className="md:w-5/12 md:pl-8 hidden md:block"></div>
-            </div>
+                <h3 className="text-xl font-bold mb-2 text-glow">Request Network End of Year Hackathon</h3>
+                <p className="text-gray-400 text-sm mb-3">120+ participants, 40+ projects, 5 finalists</p>
+                
+                <p className="text-gray-300 mb-4">HireFree: Decentralized Freelance Collaboration Platform — Streamlining milestone-based payments for freelancers</p>
+                
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }} 
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <GameButton 
+                    href="https://dorahacks.io/buidl/20606" 
+                    target="_blank" 
+                    type="primary"
+                    size="sm"
+                  >
+                    View Project Showcase
+                  </GameButton>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
-
-
 
       {/* Projects Section */}
-      <section id="projects" className="py-16 px-8 md:px-16">
-        <h2 className="text-3xl font-bold mb-10 text-center">Projects</h2>
-        <div className="max-w-4xl mx-auto space-y-12">
-          {/* Project 1 */}
-          <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-40 h-40 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path d="M11.584 2.376a.75.75 0 01.832 0l9 6a.75.75 0 11-.832 1.248L12 3.901 3.416 9.624a.75.75 0 01-.832-1.248l9-6z" />
-                <path fillRule="evenodd" d="M20.25 10.332v9.918H21a.75.75 0 010 1.5H3a.75.75 0 010-1.5h.75v-9.918a.75.75 0 01.634-.74A49.109 49.109 0 0112 9c2.59 0 5.134.202 7.616.592a.75.75 0 01.634.74zm-7.5 2.418a.75.75 0 00-1.5 0v6.75a.75.75 0 001.5 0v-6.75zm3-.75a.75.75 0 01.75.75v6.75a.75.75 0 01-1.5 0v-6.75a.75.75 0 01.75-.75zM9 12.75a.75.75 0 00-1.5 0v6.75a.75.75 0 001.5 0v-6.75z" clipRule="evenodd" />
-                <path d="M12 7.875a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z" />
-              </svg>
-            </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="hidden md:block flex-shrink-0">
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">AgentActs.eth – Decentralized AI Agent Builder</h3>
-                <p className="text-gray-600 mb-4">1st Place Winner in 1inch Fusion+ Track at ETHGlobal Taipei</p>
-                <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-4">
-                  <li>Developed platform enabling users to deploy decentralized AI agents; onboarded 50+ test agents across 4 integrated MCPs.</li>
-                  <li>Integrated MCPs: Twitter (social data), 1inch (DeFi automation), Google Maps, and Hyperbrowser.</li>
-                  <li>Built partner integrations with Polygon, ENS, and a Dockerized Python backend.</li>
-                  <li>Pay-per-use model supports token-gated access and promotes creator revenue from agent usage.</li>
-                </ul>
-                <div className="flex flex-wrap gap-3 mt-4">
-                  <a 
-                    href="https://ethglobal.com/showcase/agentacts-eth-9yjkl" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>Project Showcase</span>
-                  </a>
-                  <a 
-                    href="https://github.com/juSt-jeLLy/agentacts" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span>Source Code</span>
-                  </a>
-                  <a 
-                    href="https://agentacts.vercel.app" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                    </svg>
-                    <span>Live Demo</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Project 2 */}
-          <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-40 h-40 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97zM6.75 8.25a.75.75 0 01.75-.75h9a.75.75 0 010 1.5h-9a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H7.5z" clipRule="evenodd" />
-              </svg>
-            </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="hidden md:block flex-shrink-0">
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">Clash of Clout – AI Meme Battle Platform</h3>
-                <p className="text-gray-600 mb-4">Winner at ETHGlobal's Agentic Ethereum Hackathon</p>
-                <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-4">
-                  <li>Launched during ETHGlobal Agentic Hackathon; attracted over 500+ meme interactions and 100+ user votes in 36 hours.</li>
-                  <li>Gamified platform where AI-generated memes meet crypto trends, enabling users to stake, vote, and earn rewards.</li>
-                  <li>Integrated real-time engagement from Twitter and Discord, and generated meme templates using GAIA nodes.</li>
-                  <li>Built on Flow blockchain with reward distribution: 70% to creators, 20% stakers, 10% platform.</li>
-                  <li>Tech Stack: Next.js, TypeScript, Flow Testnet, Express, Collab.Land AI-Agent-Kit, GAIANET, Twitter API.</li>
-                </ul>
-                <div className="flex flex-wrap gap-3 mt-4">
-                  <a 
-                    href="https://ethglobal.com/showcase/clash-of-clout-ixvs9" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>Project Showcase</span>
-                  </a>
-                  <a 
-                    href="https://github.com/juSt-jeLLy/clash-of-clout" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span>Source Code</span>
-                  </a>
-                  <a 
-                    href="https://clash-of-clout.vercel.app" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                    </svg>
-                    <span>Live Demo</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Project 3 */}
-          <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-40 h-40 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path d="M21.721 12.752a9.711 9.711 0 00-.945-5.003 12.754 12.754 0 01-4.339 2.708 18.991 18.991 0 01-.214 4.772 17.165 17.165 0 005.498-2.477zM14.634 15.55a17.324 17.324 0 00.332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 00.332 4.647 17.385 17.385 0 005.268 0zM9.772 17.119a18.963 18.963 0 004.456 0A17.182 17.182 0 0112 21.724a17.18 17.18 0 01-2.228-4.605zM7.777 15.23a18.87 18.87 0 01-.214-4.774 12.753 12.753 0 01-4.34-2.708 9.711 9.711 0 00-.944 5.004 17.165 17.165 0 005.498 2.477zM21.356 14.752a9.765 9.765 0 01-7.478 6.817 18.64 18.64 0 001.988-4.718 18.627 18.627 0 005.49-2.098zM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 001.988 4.718 9.765 9.765 0 01-7.478-6.816zM13.878 2.43a9.755 9.755 0 016.116 3.986 11.267 11.267 0 01-3.746 2.504 18.63 18.63 0 00-2.37-6.49zM12 2.276a17.152 17.152 0 012.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0112 2.276zM10.122 2.43a18.629 18.629 0 00-2.37 6.49 11.266 11.266 0 01-3.746-2.504 9.754 9.754 0 016.116-3.985z" />
-              </svg>
-            </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="hidden md:block flex-shrink-0">
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">HireFree – Decentralized Freelance Collaboration Platform</h3>
-                <p className="text-gray-600 mb-4">Finalist at Request Network End of Year Hackathon</p>
-                <ul className="list-disc pl-5 space-y-2 text-gray-700 mb-4">
-                  <li>Streamlined freelance payments for small teams; demo tracked 3 milestone-based collaborations totaling $1,500 in simulated invoices.</li>
-                  <li>Milestone-Based Payments: Automates invoice generation and payments with Request Network.</li>
-                  <li>Blockchain-Verified Profiles: Immutable, tamper-proof portfolios.</li>
-                  <li>Real-Time Notifications: Delivered via XMTP + Converse app integration.</li>
-                  <li>Smart Contract Tracking: Ensures transparent, dispute-free workflows and fund release.</li>
-                </ul>
-                <div className="flex flex-wrap gap-3 mt-4">
-                  <a 
-                    href="https://devpost.com/software/hirefree" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>Project Showcase</span>
-                  </a>
-                  <a 
-                    href="https://github.com/juSt-jeLLy/hirefree" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span>Source Code</span>
-                  </a>
-                  <a 
-                    href="https://hirefree.vercel.app" 
-                    target="_blank" 
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1 rounded-full"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                    </svg>
-                    <span>Live Demo</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-          {/* Education Section */}
-          <section className="py-16 px-8 md:px-16 bg-gray-50">
-        <h2 className="text-3xl font-bold mb-10 text-center">Education</h2>
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path d="M11.7 2.805a.75.75 0 01.6 0A60.65 60.65 0 0122.83 8.72a.75.75 0 01-.231 1.337 49.949 49.949 0 00-9.902 3.912l-.003.002-.34.18a.75.75 0 01-.707 0A50.009 50.009 0 007.5 12.174v-.224c0-.131.067-.248.172-.311a54.614 54.614 0 014.653-2.52.75.75 0 00-.65-1.352 56.129 56.129 0 00-4.78 2.589 1.858 1.858 0 00-.859 1.228 49.803 49.803 0 00-4.634-1.527.75.75 0 01-.231-1.337A60.653 60.653 0 0111.7 2.805z" />
-                <path d="M13.06 15.473a48.45 48.45 0 017.666-3.282c.134 1.414.22 2.843.255 4.285a.75.75 0 01-.46.71 47.878 47.878 0 00-8.105 4.342.75.75 0 01-.832 0 47.877 47.877 0 00-8.104-4.342.75.75 0 01-.461-.71c.035-1.442.121-2.87.255-4.286A48.4 48.4 0 016 13.18v1.27a1.5 1.5 0 00-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.661a6.729 6.729 0 00.551-1.608 1.5 1.5 0 00.14-2.67v-.645a48.549 48.549 0 013.44 1.668 2.25 2.25 0 002.12 0z" />
-                <path d="M4.462 19.462c.42-.419.753-.89 1-1.394.453.213.902.434 1.347.661a6.743 6.743 0 01-1.286 1.794.75.75 0 11-1.06-1.06z" />
-              </svg>
-            </div>
-            
-            <div className="flex items-start gap-4">
-              <div className="hidden md:block flex-shrink-0">
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                  </svg>
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-1">The LNM Institute of Information Technology</h3>
-                <p className="text-gray-600 mb-1">Bachelor of Engineering (B.E.) in Electronics and Communication Engineering | 2021 - 2025</p>
-                <p className="text-gray-700">Jaipur, Rajasthan</p>
-                
-                <div className="flex flex-wrap gap-2 mt-3">
-                
-                  <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                    <span>Blockchain Research</span>
-                  </span>
-                  <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <span>Technical Club Member</span>
-                  </span>
-                </div>
-                
-         
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* Technical Skills Section */}
-            {/* Technical Skills Section */}
-            <section id="skills" className="py-16 px-8 md:px-16">
-            <h2 className="text-3xl font-bold mb-10 text-center">Technical Skills</h2>
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Languages */}
-            <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-              {/* Background pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                  <path fillRule="evenodd" d="M14.447 3.027a.75.75 0 01.527.92l-4.5 16.5a.75.75 0 01-1.448-.394l4.5-16.5a.75.75 0 01.921-.526zM16.72 6.22a.75.75 0 011.06 0l5.25 5.25a.75.75 0 010 1.06l-5.25 5.25a.75.75 0 11-1.06-1.06L21.44 12l-4.72-4.72a.75.75 0 010-1.06zm-9.44 0a.75.75 0 010 1.06L2.56 12l4.72 4.72a.75.75 0 11-1.06 1.06L.97 12.53a.75.75 0 010-1.06l5.25-5.25a.75.75 0 011.06 0z" clipRule="evenodd" />
-                </svg>
-              </div>
+      <section id="projects" className="py-20 px-8 md:px-16">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <GlitchText text="PROJECTS" className="text-3xl md:text-4xl font-bold mb-4" />
+            <p className="text-gray-400 max-w-2xl mx-auto">A showcase of my blockchain and web development projects.</p>
+          </motion.div>
               
-              <div className="flex items-start gap-4">
-                <div className="hidden md:block flex-shrink-0">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3">Languages</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>TypeScript</span>
-                    </span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>JavaScript</span>
-                    </span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>Solidity</span>
-                    </span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>HTML</span>
-                    </span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>CSS</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
+          <div className="space-y-16">
+            {/* AgentActs.eth */}
+            <div className="flex flex-col md:flex-row gap-10 items-center">
+              <motion.div 
+                initial={{ opacity: 0, x: -100, rotateY: 30 }}
+                whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+                transition={{ duration: 0.8, type: "spring", stiffness: 80 }}
+                viewport={{ once: true }}
+                className="md:w-5/12 perspective-1000"
+              >
+                <motion.div 
+                  className="card-glow rounded-lg overflow-hidden transform-gpu"
+                  whileHover={{ 
+                    rotateY: 10, 
+                    rotateX: 5,
+                    scale: 1.05,
+                    boxShadow: "0 20px 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 234, 255, 0.5)"
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="relative aspect-video bg-deep-blue overflow-hidden">
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00eaff] to-transparent opacity-20"
+                      initial={{ x: '-100%' }}
+                      animate={{ x: '100%' }}
+                      transition={{ 
+                        repeat: Infinity, 
+                        duration: 1.5, 
+                        ease: "linear",
+                        repeatDelay: 0.8
+                      }}
+                    />
+                    <Image
+                      src="/images.webp"
+                      alt="AgentActs.eth"
+                      width={500}
+                      height={300}
+                      className="object-cover w-full h-full opacity-90 hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#000f2b] to-transparent opacity-70"></div>
+                    <motion.div 
+                      className="absolute bottom-4 left-4"
+                      animate={{ 
+                        textShadow: [
+                          "0 0 5px rgba(0, 234, 255, 0.3)", 
+                          "0 0 15px rgba(0, 234, 255, 0.7)", 
+                          "0 0 5px rgba(0, 234, 255, 0.3)"
+                        ] 
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <GlitchText text="AgentActs.eth" fontSize="1.5rem" className="z-10" />
+                    </motion.div>
+                    <div className="absolute inset-0 bg-grid opacity-20"></div>
+                    
+                    {/* Digital circuit lines */}
+                    <motion.div
+                      className="absolute inset-0 overflow-hidden"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 1 }}
+                      viewport={{ once: true }}
+                    >
+                      <svg width="100%" height="100%" viewBox="0 0 400 225" className="absolute">
+                        <motion.path
+                          d="M20,100 L80,100 L100,120 L150,120"
+                          stroke="#00eaff"
+                          strokeWidth="0.5"
+                          strokeDasharray="200"
+                          strokeDashoffset="200"
+                          fill="none"
+                          initial={{ strokeDashoffset: 200 }}
+                          animate={{ strokeDashoffset: 0 }}
+                          transition={{ duration: 1.5, delay: 0.3 }}
+                        />
+                        <motion.path
+                          d="M380,50 L320,50 L300,70 L300,180 L280,200 L100,200"
+                          stroke="#00eaff"
+                          strokeWidth="0.5"
+                          strokeDasharray="600"
+                          strokeDashoffset="600"
+                          fill="none"
+                          initial={{ strokeDashoffset: 600 }}
+                          animate={{ strokeDashoffset: 0 }}
+                          transition={{ duration: 2, delay: 0.5 }}
+                        />
+              </svg>
+                    </motion.div>
             </div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 100, filter: "blur(8px)" }}
+                whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, delay: 0.3, type: "spring" }}
+                viewport={{ once: true }}
+                className="md:w-7/12"
+              >
+                <motion.div 
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#000f2b] border border-[#00eaff] text-[#00eaff] mb-3"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  whileHover={{ 
+                    scale: 1.05, 
+                    boxShadow: "0 0 15px rgba(0, 234, 255, 0.7)" 
+                  }}
+                >
+                  1st Place Winner at ETHGlobal Taipei
+                </motion.div>
+                <motion.h3 
+                  className="text-2xl font-bold mb-3 text-glow"
+                  initial={{ y: 20, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  animate={{ 
+                    textShadow: [
+                      "0 0 5px rgba(0, 234, 255, 0.3)", 
+                      "0 0 15px rgba(0, 234, 255, 0.5)", 
+                      "0 0 5px rgba(0, 234, 255, 0.3)"
+                    ] 
+                  }}
+                  transition={{ 
+                    textShadow: { duration: 2, repeat: Infinity },
+                    y: { duration: 0.5, delay: 0.6 },
+                    default: { duration: 0.5, delay: 0.6 }
+                  }}
+                >
+                  AgentActs.eth – Decentralized AI Agent Builder
+                </motion.h3>
+                
+                <motion.p 
+                  className="text-gray-300 mb-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
+                  viewport={{ once: true }}
+                >
+                  Developed platform enabling users to deploy decentralized AI agents; onboarded 50+ test agents across 4 integrated MCPs.
+                </motion.p>
+                
+                <motion.ul 
+                  className="space-y-2 mb-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ 
+                    staggerChildren: 0.1,
+                    delayChildren: 0.8
+                  }}
+                >
+                  <motion.li 
+                    className="flex items-start"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.div 
+                      className="text-[#00eaff] mr-2 mt-1"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >◈</motion.div>
+                    <span className="text-gray-300">Integrated MCPs: Twitter (social data), 1inch (DeFi automation), Google Maps, and Hyperbrowser.</span>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-start"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.div 
+                      className="text-[#00eaff] mr-2 mt-1"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+                    >◈</motion.div>
+                    <span className="text-gray-300">Built partner integrations with Polygon, ENS, and a Dockerized Python backend.</span>
+                  </motion.li>
+                  <motion.li 
+                    className="flex items-start"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.div 
+                      className="text-[#00eaff] mr-2 mt-1"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
+                    >◈</motion.div>
+                    <span className="text-gray-300">Pay-per-use model supports token-gated access and promotes creator revenue from agent usage.</span>
+                  </motion.li>
+                </motion.ul>
+                
+                <motion.div 
+                  className="flex flex-wrap gap-3 mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1 }}
+                  viewport={{ once: true }}
+                >
+                  {['TypeScript', 'React.js', 'Solidity', '1inch Fusion+', 'ENS', 'Polygon'].map((tech, index) => (
+                    <motion.div 
+                      key={tech}
+                      className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm"
+                      whileHover={{ 
+                        scale: 1.1, 
+                        backgroundColor: '#000f2b',
+                        borderColor: '#00eaff',
+                        color: '#00eaff'
+                      }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.3, 
+                        delay: 1 + (index * 0.1)
+                      }}
+                    >
+                      {tech}
+                    </motion.div>
+                  ))}
+                </motion.div>
+                
+                <motion.div 
+                  className="flex flex-wrap gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1.2 }}
+                  viewport={{ once: true }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 500 }}
+                  >
+                    <GameButton 
+                      href="https://ethglobal.com/showcase/agentacts-eth-89iga" 
+                      target="_blank" 
+                      type="primary"
+                      size="sm"
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                      }
+                    >
+                      Project Showcase
+                    </GameButton>
+                  </motion.div>
+                  
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 500 }}
+                  >
+                    <GameButton 
+                      href="https://github.com/juSt-jeLLy/ETH-Taipei" 
+                      target="_blank"
+                      type="secondary"
+                      size="sm"
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                      }
+                    >
+                      Source Code
+                    </GameButton>
+                  </motion.div>
+                  
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 500 }}
+                  >
+                    <GameButton 
+                      href="https://dynamic-ai-atelier-5nby.vercel.app/" 
+                      target="_blank"
+                      type="danger"
+                      size="sm"
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                      }
+                    >
+                      Live Demo
+                    </GameButton>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+                </div>
+            
+            {/* Clash of Clout */}
+            <div className="flex flex-col md:flex-row-reverse gap-10 items-center">
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="md:w-5/12"
+              >
+                <div className="card-red rounded-lg overflow-hidden">
+                  <div className="relative aspect-video bg-deep-blue overflow-hidden">
+                    <Image
+                      src="/Coc.webp"
+                      alt="Clash of Clout"
+                      width={500}
+                      height={300}
+                      className="object-cover w-full h-full opacity-90 hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0012] to-transparent opacity-70"></div>
+                    <div className="absolute bottom-4 left-4">
+                      <GlitchText text="Clash of Clout" fontSize="1.5rem" className="z-10" highlightColor="var(--red-accent)" />
+              </div>
+                    <div className="absolute inset-0 bg-grid opacity-20"></div>
+            </div>
+          </div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="md:w-7/12"
+              >
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#0a0012] border border-[#ff2c2c] text-[#ff2c2c] mb-3">
+                  Winner at ETHGlobal's Agentic Ethereum
+            </div>
+                <h3 className="text-2xl font-bold mb-3 text-glow">Clash of Clout – AI Meme Battle Platform</h3>
+                
+                <p className="text-gray-300 mb-4">
+                  Launched during ETHGlobal Agentic Hackathon; attracted over 500+ meme interactions and 100+ user votes in 36 hours.
+                </p>
+                
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-start">
+                    <div className="text-[#ff2c2c] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Gamified platform where AI-generated memes meet crypto trends, enabling users to stake, vote, and earn rewards.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="text-[#ff2c2c] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Integrated real-time engagement from Twitter and Discord, and generated meme templates using GAIA nodes.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="text-[#ff2c2c] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Built on Flow blockchain with reward distribution: 70% to creators, 20% stakers, 10% platform.</span>
+                  </li>
+                </ul>
+                
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Next.js</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">TypeScript</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Flow Testnet</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Express</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Collab.Land AI-Agent-Kit</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">GAIANET</div>
+                </div>
+                
+                <div className="flex flex-wrap gap-4">
+                  <GameButton 
+                    href="https://ethglobal.com/showcase/clash-of-clout-qedfz" 
+                    target="_blank" 
+                    type="danger"
+                    size="sm"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    }
+                  >
+                    Project Showcase
+                  </GameButton>
+                  
+                  <GameButton 
+                    href="https://github.com/juSt-jeLLy/Clash-of-Clout" 
+                    target="_blank"
+                    type="secondary"
+                    size="sm"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    }
+                  >
+                    Source Code
+                  </GameButton>
+                  
+                  <GameButton 
+                    href="https://clash-of-clout-azure.vercel.app/" 
+                    target="_blank"
+                    type="primary"
+                    size="sm"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    }
+                  >
+                    Live Demo
+                  </GameButton>
+                </div>
+              </motion.div>
+              </div>
+            
+            {/* HireFree */}
+            <div className="flex flex-col md:flex-row gap-10 items-center">
+              <motion.div 
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="md:w-5/12"
+              >
+                <div className="card-glow rounded-lg overflow-hidden">
+                  <div className="relative aspect-video bg-deep-blue overflow-hidden">
+                    <Image
+                      src="/logojj.png"
+                      alt="HireFree"
+                      width={500}
+                      height={300}
+                      className="object-cover w-full h-full opacity-90 hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#000f2b] to-transparent opacity-70"></div>
+                    <div className="absolute bottom-4 left-4">
+                      <GlitchText text="HireFree" fontSize="1.5rem" className="z-10" />
+            </div>
+                    <div className="absolute inset-0 bg-grid opacity-20"></div>
+          </div>
+            </div>
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="md:w-7/12"
+              >
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#000f2b] border border-[#00eaff] text-[#00eaff] mb-3">
+                  Finalist at Request Network Hackathon
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-glow">HireFree – Decentralized Freelance Platform</h3>
+                
+                <p className="text-gray-300 mb-4">
+                  Streamlined freelance payments for small teams; demo tracked 3 milestone-based collaborations totaling $1,500 in simulated invoices.
+                </p>
+                
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-start">
+                    <div className="text-[#00eaff] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Milestone-Based Payments: Automates invoice generation and payments with Request Network.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="text-[#00eaff] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Blockchain-Verified Profiles: Immutable, tamper-proof portfolios.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="text-[#00eaff] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Real-Time Notifications: Delivered via XMTP + Converse app integration.</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="text-[#00eaff] mr-2 mt-1">◈</div>
+                    <span className="text-gray-300">Smart Contract Tracking: Ensures transparent, dispute-free workflows and fund release.</span>
+                  </li>
+                </ul>
+                
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">React.js</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Solidity</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Request Network</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">XMTP</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Hardhat</div>
+                  <div className="bg-[#0a0a0a] border border-[#2a2a2a] px-3 py-1 rounded-full text-sm">Ethers.js</div>
+                </div>
+                
+                <div className="flex flex-wrap gap-4">
+                  <GameButton 
+                    href="https://dorahacks.io/buidl/20606" 
+                    target="_blank" 
+                    type="primary"
+                    size="sm"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    }
+                  >
+                    Project Showcase
+                  </GameButton>
+                  
+                  <GameButton 
+                    href="https://github.com/juSt-jeLLy/hirefree" 
+                    target="_blank"
+                    type="secondary"
+                    size="sm"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    }
+                  >
+                    Source Code
+                  </GameButton>
+                  
+                  <GameButton 
+                    href="https://hirefree.vercel.app/" 
+                    target="_blank"
+                    type="danger"
+                    size="sm"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    }
+                  >
+                    Live Demo
+                  </GameButton>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section id="skills" className="py-20 px-8 md:px-16 bg-deep-blue bg-opacity-30">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <GlitchText text="SKILLS" className="text-3xl md:text-4xl font-bold mb-4" />
+            <p className="text-gray-400 max-w-2xl mx-auto">My technical expertise and proficiencies.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Languages */}
+            <motion.div 
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.7, type: "spring" }}
+              viewport={{ once: true }}
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-grid"></div>
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4 flex items-center text-glow">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+                  Languages
+                </h3>
+                
+                <motion.div 
+                  className="space-y-3"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={{
+                    visible: { transition: { staggerChildren: 0.1 } },
+                    hidden: {}
+                  }}
+                >
+                  <motion.div 
+                    className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors group"
+                    variants={{
+                      hidden: { opacity: 0, x: -20 },
+                      visible: { opacity: 1, x: 0, transition: { duration: 0.5 } }
+                    }}
+                  >
+                    <div className="flex justify-between mb-1">
+                      <span className="font-medium">TypeScript</span>
+                      <span className="text-[#00eaff] text-sm group-hover:animate-pulse">Advanced</span>
+            </div>
+                    <div className="h-1.5 bg-[#001a33] rounded-full overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-[#00eaff] rounded-full"
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "90%" }}
+                        transition={{ duration: 1, delay: 0.3 }}
+                        viewport={{ once: true }}
+                      />
+                    </div>
+                  </motion.div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors group">
+                    <div className="flex justify-between mb-1">
+                      <span className="font-medium">JavaScript</span>
+                      <span className="text-[#00eaff] text-sm group-hover:animate-pulse">Advanced</span>
+                </div>
+                    <div className="h-1.5 bg-[#001a33] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#00eaff] rounded-full w-[90%]"></div>
+              </div>
+                  </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors group">
+                    <div className="flex justify-between mb-1">
+                      <span className="font-medium">Solidity</span>
+                      <span className="text-[#00eaff] text-sm group-hover:animate-pulse">Advanced</span>
+                    </div>
+                    <div className="h-1.5 bg-[#001a33] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#00eaff] rounded-full w-[85%]"></div>
+                    </div>
+                </div>
+                
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors group">
+                    <div className="flex justify-between mb-1">
+                      <span className="font-medium">HTML/CSS</span>
+                      <span className="text-[#00eaff] text-sm group-hover:animate-pulse">Advanced</span>
+              </div>
+                    <div className="h-1.5 bg-[#001a33] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#00eaff] rounded-full w-[90%]"></div>
+            </div>
+          </div>
+                </motion.div>
+        </div>
+            </motion.div>
             
             {/* Frameworks / Libraries */}
-            <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-              {/* Background pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                  <path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 00.372.648l8.628 5.033z" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-grid"></div>
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4 flex items-center text-glow">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
+                  Frameworks / Libraries
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">React.js</span>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="hidden md:block flex-shrink-0">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Next.js</span>
                   </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Redux</span>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3">Frameworks / Libraries</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">React.js</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Next.js</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Redux</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Node.js</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Express.js</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Tailwind CSS</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Socket.io</span>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Node.js</span>
                   </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Express.js</span>
+                </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Tailwind CSS</span>
+              </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Socket.io</span>
+            </div>
+            
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">MongoDB</span>
+              </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
             
             {/* Blockchain / Web3 */}
-            <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-              {/* Background pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                  <path d="M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875z" />
-                  <path d="M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 001.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 001.897 1.384C6.809 12.164 9.315 12.75 12 12.75z" />
-                  <path d="M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 001.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 001.897 1.384C6.809 15.914 9.315 16.5 12 16.5z" />
-                  <path d="M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 001.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 001.897 1.384C6.809 19.664 9.315 20.25 12 20.25z" />
-                </svg>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="hidden md:block flex-shrink-0">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-grid"></div>
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4 flex items-center text-glow">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
+                  Blockchain / Web3
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Ethers.js</span>
                   </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Hardhat</span>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3">Blockchain / Web3</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Ethers.js</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Hardhat</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">WalletConnect</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">XMTP</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Scaffold-ETH 2</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Flow Blockchain</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Polygon</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">RequestNetwork</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">ENS</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Tableland</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">1inch Fusion+</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Collab.Land</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">GAIA Network</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">wagmi</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">MongoDB</span>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">WalletConnect</span>
                   </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">XMTP</span>
                 </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Scaffold-ETH 2</span>
               </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Flow Blockchain</span>
             </div>
             
-            {/* Tools / DevOps */}
-            <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-              {/* Background pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                  <path fillRule="evenodd" d="M12 6.75a5.25 5.25 0 016.775-5.025.75.75 0 01.313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 011.248.313 5.25 5.25 0 01-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 112.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0112 6.75zM4.117 19.125a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75h-.008a.75.75 0 01-.75-.75v-.008z" clipRule="evenodd" />
-                </svg>
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Polygon</span>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="hidden md:block flex-shrink-0">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">ENS</span>
+                  </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">RequestNetwork</span>
+                </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Tableland</span>
+                  </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">1inch Fusion+</span>
+                </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Collab.Land</span>
+              </div>
+            </div>
+              </div>
+            </motion.div>
+            
+            {/* Tools / DevOps */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              viewport={{ once: true }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-grid"></div>
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4 flex items-center text-glow">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
+                  Tools / DevOps
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Git/GitHub</span>
                   </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Docker</span>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3">Tools / DevOps</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Git/GitHub</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Docker</span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">Postman</span>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Postman</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
+            
+
             
             {/* Security / Auditing */}
-            <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden col-span-1 md:col-span-2">
-              {/* Background pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                  <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.75.75 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              viewport={{ once: true }}
+              className="card-glow p-6 rounded-lg relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-grid"></div>
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4 flex items-center text-glow">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
+                  Security / Auditing
+                </h3>
+                
+                <p className="text-gray-300 mb-4">
+                  Completed CTFs including Ethernaut (OpenZeppelin), conducted smart contract audits; wrote unit and integration tests.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Smart Contract Auditing</span>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="hidden md:block flex-shrink-0">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Ethernaut CTF</span>
                   </div>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Unit Testing</span>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-3">Security / Auditing</h3>
-                  <p className="text-gray-700 mb-3">Completed CTFs including Ethernaut (OpenZeppelin), conducted smart contract audits; wrote unit and integration tests.</p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>Smart Contract Auditing</span>
-                    </span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>Ethernaut CTF</span>
-                    </span>
-                    <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <span>Unit & Integration Testing</span>
-                    </span>
+                  
+                  <div className="bg-[#000a16] p-3 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors flex items-center justify-center text-center">
+                    <span className="font-medium">Integration Testing</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-           {/* Extracurricular Section */}
-           <section className="py-16 px-8 md:px-16 bg-gray-50">
-        <h2 className="text-3xl font-bold mb-10 text-center">Extracurricular</h2>
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a2.25 2.25 0 01-.233.96 10.088 10.088 0 005.06-1.01.75.75 0 00.42-.643 4.875 4.875 0 00-6.957-4.611 8.586 8.586 0 011.71 5.157v.003z" />
-              </svg>
-            </div>
+      {/* Education & Extracurriculars Section */}
+      <section id="education" className="py-20 px-8 md:px-16">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <GlitchText text="EDUCATION & ACTIVITIES" className="text-3xl md:text-4xl font-bold mb-4" />
+            <p className="text-gray-400 max-w-2xl mx-auto">Academic background and extracurricular involvement</p>
+          </motion.div>
             
-            <div className="flex items-start gap-4">
-              <div className="hidden md:block flex-shrink-0">
-                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          <div className="grid md:grid-cols-2 gap-10">
+            {/* Education */}
+            <motion.div 
+              initial={{ opacity: 0, x: -100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ 
+                duration: 0.8, 
+                type: "spring", 
+                stiffness: 100,
+                damping: 15 
+              }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                y: -10,
+                boxShadow: '0 0 25px var(--glow-blue), 0 0 35px var(--glow-blue)'
+              }}
+            >
+              <div className="card-glow p-6 rounded-lg relative overflow-hidden h-full">
+                <div className="absolute inset-0 bg-grid"></div>
+                
+                {/* Digital grid animation */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00eaff] to-transparent opacity-10"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '100%' }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 2, 
+                    ease: "linear",
+                    repeatDelay: 1
+                  }}
+                />
+                
+                <motion.div 
+                  className="absolute -bottom-2 -right-2 w-32 h-32 opacity-10"
+                  animate={{ 
+                    rotate: 360,
+                    opacity: [0.1, 0.15, 0.1]
+                  }}
+                  transition={{ 
+                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                    opacity: { duration: 3, repeat: Infinity, yoyo: true }
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#00eaff]">
+                    <path d="M11.7 2.805a.75.75 0 01.6 0A60.65 60.65 0 0122.83 8.72a.75.75 0 01-.231 1.337 49.949 49.949 0 00-9.902 3.912l-.003.002-.34.18a.75.75 0 01-.707 0A50.009 50.009 0 007.5 12.174v-.224c0-.131.067-.248.172-.311a54.614 54.614 0 014.653-2.52.75.75 0 00-.65-1.352 56.129 56.129 0 00-4.78 2.589 1.858 1.858 0 00-.859 1.228 49.803 49.803 0 00-4.634-1.527.75.75 0 01-.231-1.337A60.653 60.653 0 0111.7 2.805z" />
+                    <path d="M13.06 15.473a48.45 48.45 0 017.666-3.282c.134 1.414.22 2.843.255 4.285a.75.75 0 01-.46.71 47.878 47.878 0 00-8.105 4.342.75.75 0 01-.832 0 47.877 47.877 0 00-8.104-4.342.75.75 0 01-.461-.71c.035-1.442.121-2.87.255-4.286A48.4 48.4 0 016 13.18v1.27a1.5 1.5 0 00-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.661a6.729 6.729 0 00.551-1.608 1.5 1.5 0 00.14-2.67v-.645a48.549 48.549 0 013.44 1.668 2.25 2.25 0 002.12 0z" />
+                    <path d="M4.462 19.462c.42-.419.753-.89 1-1.394.453.213.902.434 1.347.661a6.743 6.743 0 01-1.286 1.794.75.75 0 11-1.06-1.06z" />
+              </svg>
+                </motion.div>
+                
+                {/* Circuit lines animation */}
+                <motion.div
+                  className="absolute inset-0 overflow-hidden pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                  viewport={{ once: true }}
+                >
+                  <svg width="100%" height="100%" viewBox="0 0 400 400" className="absolute">
+                    <motion.path
+                      d="M20,100 L80,100 L100,120 L150,120"
+                      stroke="#00eaff"
+                      strokeWidth="0.5"
+                      strokeDasharray="200"
+                      strokeDashoffset="200"
+                      fill="none"
+                      initial={{ strokeDashoffset: 200 }}
+                      animate={{ strokeDashoffset: 0 }}
+                      transition={{ duration: 1.5, delay: 0.3 }}
+                    />
+                    <motion.path
+                      d="M380,50 L320,50 L300,70 L300,180 L280,200 L100,200"
+                      stroke="#00eaff"
+                      strokeWidth="0.5"
+                      strokeDasharray="600"
+                      strokeDashoffset="600"
+                      fill="none"
+                      initial={{ strokeDashoffset: 600 }}
+                      animate={{ strokeDashoffset: 0 }}
+                      transition={{ duration: 2, delay: 0.5 }}
+                    />
                   </svg>
+                </motion.div>
+                <div className="relative z-10">
+                  <motion.h3 
+                    className="text-xl font-bold mb-6 flex items-center text-glow"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                      <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                      </svg>
+                    Academic Background
+                  </motion.h3>
+                  
+                  <div className="space-y-6">
+                    <motion.div 
+                      className="bg-[#000a16] p-5 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      viewport={{ once: true }}
+                      whileHover={{ 
+                        scale: 1.02, 
+                        boxShadow: "0 0 15px rgba(0, 234, 255, 0.3)"
+                      }}
+                    >
+                      <h4 className="font-bold text-lg">The LNM Institute of Information Technology</h4>
+                      <p className="text-gray-400 mb-1">Bachelor of Engineering (B.E.) in Electronics and Communication Engineering</p>
+                      <p className="text-gray-400 mb-3">2021 - 2025 | Jaipur, Rajasthan</p>
+                      <div className="border-t border-[#00eaff] border-opacity-20 pt-3 mt-3">
+                        <p className="text-gray-300 mb-3">Relevant coursework and achievements:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['Blockchain Research', 'Data Structures & Algorithms', 'Computer Networks', 'Technical Writing'].map((course, index) => (
+                            <motion.span 
+                              key={course}
+                              className="bg-[#001a33] px-2 py-1 rounded text-xs"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ 
+                                duration: 0.3, 
+                                delay: 0.3 + (index * 0.1) 
+                              }}
+                              whileHover={{ 
+                                scale: 1.05, 
+                                backgroundColor: '#002a4d',
+                                boxShadow: "0 0 8px rgba(0, 234, 255, 0.4)"
+                              }}
+                            >
+                              {course}
+                            </motion.span>
+                          ))}
                 </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-3">Campus Involvement & Activities</h3>
-                
-                <div className="mb-4">
-                  <h4 className="font-semibold text-blue-700 mb-2">Social Welfare</h4>
-                  <div className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-gray-700">
-                      Active member of CWPH (Club for Welfare of Public Health), organizing community service events and health awareness campaigns across campus and local communities.
-                    </p>
+                    </motion.div>
                   </div>
                 </div>
+            </div>
+            </motion.div>
+            
+            {/* Extracurricular Activities */}
+            <motion.div 
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ 
+                duration: 0.8, 
+                type: "spring", 
+                stiffness: 100,
+                damping: 15 
+              }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                y: -10,
+                boxShadow: '0 0 25px var(--glow-blue), 0 0 35px var(--glow-blue)'
+              }}
+            >
+              <div className="card-glow p-6 rounded-lg relative overflow-hidden h-full">
+                <div className="absolute inset-0 bg-grid"></div>
                 
-                <div className="mb-4">
-                  <h4 className="font-semibold text-blue-700 mb-2">Sports</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                {/* Digital grid animation */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00eaff] to-transparent opacity-10"
+                  initial={{ x: '100%' }}
+                  animate={{ x: '-100%' }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 2, 
+                    ease: "linear",
+                    repeatDelay: 1
+                  }}
+                />
+                
+                <motion.div 
+                  className="absolute -bottom-2 -right-2 w-32 h-32 opacity-10"
+                  animate={{ 
+                    rotate: 360,
+                    opacity: [0.1, 0.15, 0.1]
+                  }}
+                  transition={{ 
+                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                    opacity: { duration: 3, repeat: Infinity, yoyo: true }
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#00eaff]">
+                    <path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 00.372.648l8.628 5.033z" />
                       </svg>
-                      <p className="text-gray-700">
-                        Cricket team member representing LNMIIT in intercollegiate tournaments, contributing to team's quarterfinal finish in regional championship.
-                      </p>
+                </motion.div>
+                
+                {/* Circuit lines animation */}
+                <motion.div
+                  className="absolute inset-0 overflow-hidden pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  transition={{ duration: 1 }}
+                  viewport={{ once: true }}
+                >
+                  <svg width="100%" height="100%" viewBox="0 0 400 400" className="absolute">
+                    <motion.path
+                      d="M380,100 L320,100 L300,120 L250,120"
+                      stroke="#00eaff"
+                      strokeWidth="0.5"
+                      strokeDasharray="200"
+                      strokeDashoffset="200"
+                      fill="none"
+                      initial={{ strokeDashoffset: 200 }}
+                      animate={{ strokeDashoffset: 0 }}
+                      transition={{ duration: 1.5, delay: 0.3 }}
+                    />
+                    <motion.path
+                      d="M20,50 L80,50 L100,70 L100,180 L120,200 L300,200"
+                      stroke="#00eaff"
+                      strokeWidth="0.5"
+                      strokeDasharray="600"
+                      strokeDashoffset="600"
+                      fill="none"
+                      initial={{ strokeDashoffset: 600 }}
+                      animate={{ strokeDashoffset: 0 }}
+                      transition={{ duration: 2, delay: 0.5 }}
+                    />
+                  </svg>
+                </motion.div>
+                
+                <div className="relative z-10">
+                  <motion.h3 
+                    className="text-xl font-bold mb-6 flex items-center text-glow"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Extracurricular Activities
+                  </motion.h3>
+                  
+                  <div className="space-y-6">
+                    <motion.div 
+                      className="bg-[#000a16] p-5 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      viewport={{ once: true }}
+                      whileHover={{ 
+                        scale: 1.02, 
+                        boxShadow: "0 0 15px rgba(0, 234, 255, 0.3)"
+                      }}
+                    >
+                      <h4 className="font-bold text-lg">Blockchain Club</h4>
+                      <p className="text-gray-400 mb-1">Core Member</p>
+                      <p className="text-gray-400 mb-3">2022 - Present</p>
+                      
+                      <div className="space-y-2 mt-2">
+                        <div className="flex items-start">
+                          <motion.div 
+                            className="text-[#00eaff] mr-2 mt-1"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >◆</motion.div>
+                          <span className="text-gray-300">Organized blockchain hackathons and workshops for 200+ students</span>
                     </div>
                     <div className="flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <p className="text-gray-700">
-                        Football team player, participating in intramural competitions and fostering team-building skills through regular practice and tournaments.
-                      </p>
+                          <motion.div 
+                            className="text-[#00eaff] mr-2 mt-1"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+                          >◆</motion.div>
+                          <span className="text-gray-300">Led technical sessions on smart contract development</span>
                     </div>
                   </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold text-blue-700 mb-2">Technical Community</h4>
+                    </motion.div>
+                    
+                    <motion.div 
+                      className="bg-[#000a16] p-5 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                      viewport={{ once: true }}
+                      whileHover={{ 
+                        scale: 1.02, 
+                        boxShadow: "0 0 15px rgba(0, 234, 255, 0.3)"
+                      }}
+                    >
+                      <h4 className="font-bold text-lg">ETHGlobal Hackathons</h4>
+                      <p className="text-gray-400 mb-1">Regular Participant</p>
+                      <p className="text-gray-400 mb-3">2023 - Present</p>
+                      
+                      <div className="space-y-2 mt-2">
                   <div className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-gray-700">
-                      Organized blockchain workshops and hackathon preparation sessions for junior students, mentoring 15+ students in Web3 development fundamentals.
-                    </p>
+                          <motion.div 
+                            className="text-[#00eaff] mr-2 mt-1"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >◆</motion.div>
+                          <span className="text-gray-300">Participated in global blockchain hackathons including ETH Taipei and Agentic Ethereum</span>
                   </div>
+                        <div className="flex items-start">
+                          <motion.div 
+                            className="text-[#00eaff] mr-2 mt-1"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+                          >◆</motion.div>
+                          <span className="text-gray-300">Mentored junior team members in Web3 development techniques</span>
                 </div>
-                
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>Leadership</span>
-                  </span>
-                  <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>Teamwork</span>
-                  </span>
-                  <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>Community Service</span>
-                  </span>
-                  <span className="inline-flex items-center text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span>Mentoring</span>
-                  </span>
                 </div>
+                    </motion.div>
               </div>
             </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
-
 
            {/* Contact Section */}
-           <section id="contact" className="py-16 px-8 md:px-16">
-        <h2 className="text-3xl font-bold mb-10 text-center">Contact</h2>
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-600 relative overflow-hidden">
-            {/* Background pattern */}
-            <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-600">
-                <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clipRule="evenodd" />
-              </svg>
+      <section id="contact" className="py-20 px-8 md:px-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <GlitchText text="CONTACT" className="text-3xl md:text-4xl font-bold mb-4" />
+            <p className="text-gray-400 max-w-2xl mx-auto">Get in touch for collaborations or opportunities.</p>
             </div>
             
-            <div className="flex flex-col md:flex-row items-start gap-8">
-              <div className="md:w-1/2">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold">Get In Touch</h3>
-                </div>
-                
-                <p className="text-gray-700 mb-6">
+          <div className="flex flex-col lg:flex-row gap-10">
+            <motion.div 
+              initial={{ opacity: 0, x: -50, rotateY: 10 }}
+              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+              transition={{ duration: 0.8, type: "spring", damping: 15 }}
+              viewport={{ once: true }}
+              className="lg:w-1/2 perspective-1000"
+              whileHover={{ 
+                scale: 1.03, 
+                transition: { duration: 0.3 }
+              }}
+            >
+              <div className="card-glow p-8 rounded-lg relative overflow-hidden h-full">
+                <div className="absolute inset-0 bg-grid"></div>
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-bold mb-6 text-glow">Get In Touch</h3>
+                  <p className="text-gray-300 mb-8">
                   I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Feel free to reach out through any of the following channels.
                 </p>
                 
-                <div className="space-y-4">
-                  <a href="tel:+919409664725" className="flex items-center gap-4 p-3 rounded-lg hover:bg-blue-50 transition-colors group">
-                    <div className="bg-blue-100 p-2 rounded-full group-hover:bg-blue-200 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="space-y-6">
+                    <div className="flex items-start">
+                      <div className="bg-[#000f2b] p-3 rounded-full border border-[#00eaff] mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#00eaff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">Phone</div>
-                      <div className="text-gray-700 group-hover:text-blue-600 transition-colors">+91 9409664725</div>
+                        <h4 className="font-bold mb-1">Phone</h4>
+                        <p className="text-gray-300">+91 9409664725</p>
                     </div>
-                  </a>
-                  
-                  <a href="mailto:yagneshpatel931@gmail.com" className="flex items-center gap-4 p-3 rounded-lg hover:bg-blue-50 transition-colors group">
-                    <div className="bg-blue-100 p-2 rounded-full group-hover:bg-blue-200 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="bg-[#000f2b] p-3 rounded-full border border-[#00eaff] mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#00eaff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">Email</div>
-                      <div className="text-gray-700 group-hover:text-blue-600 transition-colors">yagneshpatel931@gmail.com</div>
+                        <h4 className="font-bold mb-1">Email</h4>
+                        <p className="text-gray-300">yagneshpatel931@gmail.com</p>
                     </div>
-                  </a>
-                  
-                  <a href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" target="_blank" className="flex items-center gap-4 p-3 rounded-lg hover:bg-blue-50 transition-colors group">
-                    <div className="bg-blue-100 p-2 rounded-full group-hover:bg-blue-200 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="bg-[#000f2b] p-3 rounded-full border border-[#00eaff] mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#00eaff]" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">LinkedIn</div>
-                      <div className="text-gray-700 group-hover:text-blue-600 transition-colors">Yagnesh Markana</div>
+                        <h4 className="font-bold mb-1">LinkedIn</h4>
+                        <a href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" target="_blank" className="text-[#00eaff] hover:underline">Yagnesh Markana</a>
                     </div>
-                  </a>
-                  
-                  <a href="https://github.com/juSt-jeLLy" target="_blank" className="flex items-center gap-4 p-3 rounded-lg hover:bg-blue-50 transition-colors group">
-                    <div className="bg-blue-100 p-2 rounded-full group-hover:bg-blue-200 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="bg-[#000f2b] p-3 rounded-full border border-[#00eaff] mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#00eaff]" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                       </svg>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">GitHub</div>
-                      <div className="text-gray-700 group-hover:text-blue-600 transition-colors">juSt-jeLLy</div>
+                        <h4 className="font-bold mb-1">GitHub</h4>
+                        <a href="https://github.com/juSt-jeLLy" target="_blank" className="text-[#00eaff] hover:underline">juSt-jeLLy</a>
                     </div>
-                  </a>
                 </div>
               </div>
-              
-              <div className="md:w-1/2 mt-8 md:mt-0">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
                   </div>
-                  <h3 className="text-xl font-bold">Availability</h3>
                 </div>
-                
-                <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
-                <div className="mb-4">
-  <h4 className="font-semibold text-blue-700 mb-2">Current Status</h4>
-  <div className="flex items-center gap-2 mb-1">
-    <span className="inline-flex h-3 w-3 bg-green-500 rounded-full"></span>
-    <span className="text-gray-700">Available for full-time jobs</span>
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="lg:w-1/2"
+            >
+              <div className="card-glow p-8 rounded-lg relative overflow-hidden h-full">
+                <div className="absolute inset-0 bg-grid"></div>
+                <div className="relative z-10">
+                  <div className="flex justify-between mb-6">
+                    <h3 className="text-2xl font-bold text-glow">Current Status</h3>
+                    <div className="flex items-center">
+                      <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="ml-2 text-sm text-gray-300">Available</span>
   </div>
-  <div className="flex items-center gap-2 mb-1">
-    <span className="inline-flex h-3 w-3 bg-green-500 rounded-full"></span>
-    <span className="text-gray-700">Open to internship opportunities</span>
   </div>
-  <div className="flex items-center gap-2">
-    <span className="inline-flex h-3 w-3 bg-green-500 rounded-full"></span>
-    <span className="text-gray-700">Available for freelance & contract work</span>
-  </div>
+                  
+                  <div className="space-y-6 mb-8">
+                    <div className="bg-[#000a16] p-4 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors">
+                      <h4 className="font-bold mb-2">Availability</h4>
+                      <ul className="space-y-2">
+                        <li className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span>Available for full-time jobs</span>
+                        </li>
+                        <li className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span>Open to internship opportunities</span>
+                        </li>
+                        <li className="flex items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span>Available for freelance & contract work</span>
+                        </li>
+                      </ul>
 </div>
 
-        
-                  
-                  <div>
-                    <h4 className="font-semibold text-blue-700 mb-2">Preferred Projects</h4>
+                    <div className="bg-[#000a16] p-4 rounded border border-[#00eaff] border-opacity-30 hover:border-opacity-70 transition-colors">
+                      <h4 className="font-bold mb-2">Preferred Projects</h4>
                     <div className="flex flex-wrap gap-2">
-                      <span className="inline-flex items-center text-blue-600 bg-white px-3 py-1 rounded-full text-sm border border-blue-100">
-                        Blockchain Development
-                      </span>
-                      <span className="inline-flex items-center text-blue-600 bg-white px-3 py-1 rounded-full text-sm border border-blue-100">
-                        Smart Contracts
-                      </span>
-                      <span className="inline-flex items-center text-blue-600 bg-white px-3 py-1 rounded-full text-sm border border-blue-100">
-                        Web3 Integration
-                      </span>
-                      <span className="inline-flex items-center text-blue-600 bg-white px-3 py-1 rounded-full text-sm border border-blue-100">
-                        DeFi Applications
-                      </span>
-                      <span className="inline-flex items-center text-blue-600 bg-white px-3 py-1 rounded-full text-sm border border-blue-100">
-                        AI-Blockchain
-                      </span>
+                        <span className="bg-[#001a33] px-3 py-1 rounded-full text-sm">Blockchain Development</span>
+                        <span className="bg-[#001a33] px-3 py-1 rounded-full text-sm">Smart Contracts</span>
+                        <span className="bg-[#001a33] px-3 py-1 rounded-full text-sm">Web3 Integration</span>
+                        <span className="bg-[#001a33] px-3 py-1 rounded-full text-sm">DeFi Applications</span>
+                        <span className="bg-[#001a33] px-3 py-1 rounded-full text-sm">AI-Blockchain</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-6 text-center">
-                  <a 
+                  <div className="text-center">
+                    <GameButton 
                     href="mailto:yagneshpatel931@gmail.com" 
-                    className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-colors"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      type="primary"
+                      icon={
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    Send a Message
-                  </a>
+                      }
+                    >
+                      SEND A MESSAGE
+                    </GameButton>
                 </div>
               </div>
             </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-8 md:px-16 border-t text-center text-gray-600">
-        <p>© {new Date().getFullYear()} Yagnesh Patel. All rights reserved.</p>
+      <footer className="py-8 px-8 md:px-16 border-t border-[#00eaff] bg-[#000f2b] bg-opacity-30">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-gray-400">© {new Date().getFullYear()} Yagnesh. All rights reserved.</p>
+          <div className="flex items-center justify-center mt-4 gap-4">
+            <a href="https://github.com/juSt-jeLLy" target="_blank" className="text-gray-400 hover:text-[#00eaff] transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/in/yagnesh-markana-72aa10204/" target="_blank" className="text-gray-400 hover:text-[#00eaff] transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+              </svg>
+            </a>
+            <a href="mailto:yagneshpatel931@gmail.com" className="text-gray-400 hover:text-[#00eaff] transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </a>
+          </div>
+          <p className="text-gray-500 text-sm mt-4">Built with Next.js, Tailwind CSS, and Three.js</p>
+        </div>
       </footer>
     </div>
-  );
+  )
 }
