@@ -13,6 +13,31 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<string>('home')
   const [isLoading, setIsLoading] = useState(true)
   const [scrollY, setScrollY] = useState(0)
+  const [showExperience, setShowExperience] = useState(false)
+
+  const experienceData = [
+    {
+      title: "Smart Contract Developer",
+      period: "Feb 2025 – May 2025",
+      company: "Kosher Capital, Germany",
+      location: "Remote",
+      achievements: [
+        "Built smart contracts for an AI-managed investment fund Launchpad to securely manage user contributions and fund access.",
+        "Developed upgradeable staking contracts for token-based participation.",
+        "Implemented factory-pattern contracts for scalable investment fund deployment."
+      ]
+    },
+    {
+      title: "Full-Stack Engineer",
+      period: "Nov 2024 – Jan 2025",
+      company: "FastBet",
+      location: "Remote",
+      achievements: [
+        "Built smart contracts for a Sports betting platform to manage escrow, payouts, and provably fair game logic.",
+        "Developed backend services with Node.js and PostgreSQL to handle bet resolution, user management, and on-chain transaction tracking."
+      ]
+    }
+  ]
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
@@ -854,6 +879,94 @@ export default function Home() {
           </div>
         </div>
       </section>
+ {/* Experience Section */}
+ <section className="mb-16">
+          <div className="text-center mb-12">
+            <GlitchText 
+              text="EXPERIENCE" 
+              fontSize="3rem"
+              className="mb-4"
+              color="var(--neon-blue)"
+              highlightColor="var(--primary)"
+            />
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+          </div>
+
+          <div className="max-w-4xl mx-auto space-y-8">
+            {experienceData.map((exp, index) => (
+              <div 
+                key={index}
+                className="relative bg-black/30 backdrop-blur-sm border border-blue-500/20 rounded-lg p-6 hover:border-blue-500/40 transition-all duration-300"
+                style={{
+                  boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)',
+                }}
+              >
+                {/* Timeline connector */}
+                <div className="absolute -left-4 top-8 w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full border-4 border-gray-900 z-10"></div>
+                {index < experienceData.length - 1 && (
+                  <div className="absolute -left-2 top-16 w-1 h-full bg-gradient-to-b from-blue-500/50 to-transparent"></div>
+                )}
+
+                <div className="ml-8">
+                  {/* Header */}
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-blue-400 mb-1">
+                        {exp.title}
+                      </h3>
+                      <p className="text-gray-300 font-medium">
+                        {exp.company} • <span className="text-gray-400">{exp.location}</span>
+                      </p>
+                    </div>
+                    <div className="mt-2 md:mt-0">
+                      <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30">
+                        {exp.period}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Achievements */}
+                  <div className="space-y-3">
+                    {exp.achievements.map((achievement, achIndex) => (
+                      <div key={achIndex} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                        <p className="text-gray-300 leading-relaxed">
+                          {achievement}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Tech stack indicators (optional) */}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {exp.title.includes('Smart Contract') && (
+                      <>
+                        <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs border border-purple-500/30">
+                          Solidity
+                        </span>
+                        <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-xs border border-green-500/30">
+                          Web3
+                        </span>
+                      </>
+                    )}
+                    {exp.title.includes('Full-Stack') && (
+                      <>
+                        <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded text-xs border border-yellow-500/30">
+                          Node.js
+                        </span>
+                        <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs border border-blue-500/30">
+                          PostgreSQL
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        
+        </section>
 
       {/* Projects Section */}
       <section id="projects" className="py-20 px-8 md:px-16">
