@@ -226,7 +226,7 @@ export default function Home() {
                 }}
               >
                 <GameButton 
-                href="/resume (8).pdf" 
+                href="/resume (9).pdf" 
                 target="_blank"
                   className="text-white"
                   type="primary"
@@ -423,7 +423,7 @@ export default function Home() {
                     }}
                   >
                     <GameButton 
-                      href="/resume (8).pdf" 
+                      href="/resume (9).pdf" 
                       target="_blank"
                       type="primary"
                       icon={
