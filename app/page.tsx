@@ -18,7 +18,7 @@ export default function Home() {
   const experienceData = [
     {
       title: "Smart Contract Developer",
-      period: "Feb 2025 – May 2025",
+      period: "Nov 2024 – May 2025",
       company: "Kosher Capital, Germany",
       location: "Remote",
       achievements: [
@@ -29,7 +29,7 @@ export default function Home() {
     },
     {
       title: "Full-Stack Engineer",
-      period: "Nov 2024 – Jan 2025",
+      period: "Sept 2024 – Oct 2024",
       company: "FastBet",
       location: "Remote",
       achievements: [
@@ -392,7 +392,7 @@ export default function Home() {
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      Web3 Explorer
+                    
                     </motion.span>
                   </motion.h2>
                 </motion.div>
